@@ -4,7 +4,7 @@ var userDAO = require('../dao/userDAO');
 var result = require('../model/result');
 
 /* list users */
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
     console.log('list users called');
     userDAO.list(function (users) {
         res.json(result.createResult(true, users));
@@ -12,7 +12,7 @@ router.get('/', function(req, res) {
 });
 
 /* get user */
-router.get('/:id', function(req, res) {
+router.get('/:id', function (req, res) {
     var id = req.params.id;
     console.log('get user called, id: ' + id);
     userDAO.getById(id, function (user) {
@@ -31,11 +31,11 @@ router.delete('/:id', function (req, res) {
 
 /* add users */
 router.post('/', function (req, res) {
-    console.log('post users called');
-    var user = req.body;
+    console.log('add user');
+    const user = req.body;
     console.log(user);
     userDAO.add(user, function (success) {
-        var r =  result.createResult(success, null);
+        const r = result.createResult(success, null);
         res.json(r);
     });
 });
@@ -47,7 +47,7 @@ router.put('/:id', function (req, res) {
     user.id = req.params.id;
     console.log(user);
     userDAO.update(user, function (success) {
-        var r =  result.createResult(success, null);
+        var r = result.createResult(success, null);
         res.json(r);
     });
 });
@@ -57,16 +57,16 @@ router.patch('/:id', function (req, res) {
     console.log('patch users called');
     userDAO.getById(req.params.id, function (user) {
         var username = req.body.username;
-        if(username) {
+        if (username) {
             user.username = username;
         }
         var password = req.body.password;
-        if(password) {
+        if (password) {
             user.password = password;
         }
         console.log(user);
         userDAO.update(user, function (success) {
-            var r =  result.createResult(success, null);
+            var r = result.createResult(success, null);
             res.json(r);
         });
     });

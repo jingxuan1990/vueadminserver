@@ -3,7 +3,7 @@ module.exports = {
         host: 'localhost',
         user: 'root',
         password: '',
-        database:'express-mysql-demo',
+        database:'spa',
         connectionLimit: 10
     }
 };
