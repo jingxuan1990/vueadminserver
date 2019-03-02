@@ -12,6 +12,7 @@
     "serve-favicon": "~2.4.5",
     "formidable": "latest",
     "cors": "latest",
-    "express-session": "latest"
+    "express-session": "latest",
+    "moment": "latest"
   }
 }
