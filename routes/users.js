@@ -34,14 +34,18 @@ router.post('/', function (req, res) {
 
     console.log('create user request body=' + JSON.stringify(user))
 
-    let sql = 'INSERT INTO user (name,nick_name,birth,address,sex,user_card)VALUES(?, ?, ?, ?, ?, ?)'
+    let sql = 'INSERT INTO user (name,nick_name,birth,address,sex,user_card, gmt_create, gmt_modified)' +
+        'VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
 
-    const formatBirth = moment().format("YYYY-MM-DD")
-    pool.query(sql, [user.name, user.nick_name, formatBirth, user.address, user.sex, user.user_card],
+    const formatBirth = moment(user.birth).format("YYYY-MM-DD")
+    const gmt_create = moment().format("YYYY-MM-DD HH:mm:ss")
+    pool.query(sql, [user.name, user.nick_name, formatBirth, user.address, user.sex, user.user_card
+            , gmt_create, gmt_create],
         (err, result) => {
             if (err) {
                 console.log(err)
-            };
+            }
+            ;
             if (result.affectedRows > 0) {
                 res.send({code: 20000, msg: "增加会员成功"});
             } else {
