@@ -4,6 +4,7 @@ const moment = require('moment');
 
 // 数据连接池
 const pool = require("../config/pool");
+const mysql = require('mysql')
 
 /**
  * 查询会员列表
@@ -29,8 +30,7 @@ router.get('/:pageNum/:pageSize', function (req, res) {
         let offset = pageSize * (pageNum - 1);
 
         // 分页查询sql
-        let sql = 'select id, name, nick_name, birth, address, sex, user_card, gmt_create, gmt_modified' +
-            ' from user order by gmt_modified  desc limit ?,?';
+        let sql = 'select * from user order by gmt_modified  desc limit ?,?';
         pool.query(sql, [offset, pageSize], (err, result) => {
             if (err) {
                 console.log(err);
@@ -58,24 +58,53 @@ router.get('/:pageNum/:pageSize', function (req, res) {
 });
 
 /**
- * 根据ID查询会员信息
+ * 模糊搜索会员
  */
-router.get('/:id', function (req, res) {
-    let sql = 'select id, name, nick_name, birth, address, sex, user_card from user ' +
-        'were id = ?';
-    let userId = req.id;
-    pool.query(sql, [userId], (err, result) => {
+router.post('/search', function (req, res) {
+    let username = req.body.name;
+    // 查询记录总数
+    let totalSql = "select count(*) as total from user where name like " + mysql.escape("%" + username + "%");
+    pool.query(totalSql, [username], (err, rows) => {
         if (err) {
-            console.log(err);
             throw err;
         }
+        let total = rows[0].total
+        selectPageByUserName(total, req, res)
+    });
 
-        if (result.affectedRows > 0) {
-            res.send({code: 20000, msg: "查询会员信息成功"});
-        } else {
-            res.send({code: -1, msg: "查询会员信息失败"});
-        }
-    })
+    function selectPageByUserName(total, req, res) {
+        let username = req.body.name
+        let pageNum = parseInt(req.body.page);
+        let pageSize = parseInt(req.body.limit);
+        let offset = pageSize * (pageNum - 1);
+
+        let sql = "select * from user where name like " + mysql.escape("%" + username + "%") + " order by gmt_modified desc limit ?, ?";
+
+        pool.query(sql, [offset, pageSize], (err, result) => {
+            if (err) {
+                console.log(err);
+                throw err;
+            }
+
+            let newList = [];
+            for (let current of result) {
+                if (current.birth) {
+                    current.birth = moment(current.birth).format("YYYY-MM-DD");
+                }
+
+                if (current.gmt_create) {
+                    current.gmt_create = moment(current.gmt_create).format("YYYY-MM-DD HH:mm:ss");
+                }
+
+                if (current.gmt_modified) {
+                    current.gmt_modified = moment(current.gmt_modified).format("YYYY-MM-DD HH:mm:ss");
+                }
+                newList.push(current);
+            }
+
+            res.send({code: 20000, data: newList, total: total, msg: "搜索成功"});
+        })
+    }
 });
 
 /**
@@ -103,13 +132,20 @@ router.delete('/:id', function (req, res) {
 router.post('/', function (req, res) {
     let user = req.body;
 
-    let sql = 'INSERT INTO user (name,nick_name,birth,address,sex,user_card, gmt_create, gmt_modified)' +
-        'VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
+    let sql = 'INSERT INTO user (name,nick_name,birth,address,sex,user_card, gmt_create, gmt_modified, phone, level)' +
+        'VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
-    const formatBirth = moment(user.birth).format("YYYY-MM-DD")
-    const gmt_create = moment().format("YYYY-MM-DD HH:mm:ss")
-    pool.query(sql, [user.name, user.nick_name, formatBirth, user.address, user.sex, user.user_card
-            , gmt_create, gmt_create],
+    let formatBirth = moment(user.birth).format("YYYY-MM-DD");
+    let gmtCreate = moment().format("YYYY-MM-DD HH:mm:ss");
+    let username = user.name;
+    let nickName = user.nick_name;
+    let address = user.address;
+    let sex = user.sex;
+    let userCard = user.user_card;
+    let phone = user.phone;
+    let level = user.level;
+
+    pool.query(sql, [username, nickName, formatBirth, address, sex, userCard, gmtCreate, gmtCreate, phone, level],
         (err, result) => {
             if (err) {
                 console.log(err);
@@ -130,14 +166,20 @@ router.post('/', function (req, res) {
 router.put('/', function (req, res) {
     let user = req.body;
 
-    let sql = 'update user set name = ?,nick_name=?,birth=?, address=?, sex=?, user_card=?, gmt_modified=?' +
+    let sql = 'update user set name = ?,nick_name=?,birth=?, address=?, sex=?, user_card=?, gmt_modified=?, phone=?, level=?' +
         'where id = ?'
 
     let formatBirth = moment(user.birth).format("YYYY-MM-DD")
     let gmtModified = moment().format("YYYY-MM-DD HH:mm:ss")
-    let userId = parseInt(user.id);
-    pool.query(sql, [user.name, user.nick_name, formatBirth, user.address, user.sex, user.user_card,
-            gmtModified, userId],
+    let userId = user.id;
+    let username = user.name;
+    let nickName = user.nick_name;
+    let address = user.address;
+    let sex = user.sex;
+    let userCard = user.user_card;
+    let phone = user.phone;
+    let level = user.level;
+    pool.query(sql, [username, nickName, formatBirth, address, sex, userCard, gmtModified, phone, level, userId],
         (err, result) => {
             if (err) {
                 console.log(err);
