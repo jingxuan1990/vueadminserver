@@ -194,4 +194,35 @@ router.put('/', function (req, res) {
         });
 });
 
+/**
+ *  检查唯一性
+ */
+router.post('/check', function (req, res) {
+    let type = req.body.type;
+    let data = req.body.data;
+    let columnName = 'phone';
+    if (type === 'userCard') {
+        columnName = 'user_card';
+    }
+
+    let sql = 'select count(*) as total from user where ' + columnName + ' =?';
+    pool.query(sql, [data], (err, rows) => {
+        if (err) {
+            throw err;
+        }
+
+        let total = rows[0].total;
+        let code = (total >= 1) ? 10000 : 20000;
+
+        let msg = '该手机号已经被注册了，请不要重复注册！';
+        if (type === 'userCard') {
+            msg = '会员卡号重复了，请核对卡号是否正确！';
+        }
+        if (code === 20000) {
+            msg = '';
+        }
+        res.send({code: code, msg: msg});
+    })
+});
+
 module.exports = router;
