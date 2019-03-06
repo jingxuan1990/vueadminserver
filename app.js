@@ -14,8 +14,8 @@ app.use(bodyParser.json());
 const cors = require("cors");
 //2:配置cors
 app.use(cors({
-    origin: ["http://127.0.0.1:9528",
-        "http://localhost:9528"],//允许列表
+    origin: ["http://127.0.0.1:9527",
+        "http://localhost:9527"],//允许列表
     credentials: true   //是否验证
 }));
 
