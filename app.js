@@ -34,7 +34,9 @@ app.use(session({
 
 // 统一配置路由
 const users = require('./routes/users');
+const roles = require('./routes/roles');
 app.use('/users', users);
+app.use('/roles', roles);
 
 // 运行端口号
 app.listen(8888);

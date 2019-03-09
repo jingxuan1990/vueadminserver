@@ -4,7 +4,7 @@ const moment = require('moment');
 
 // 数据连接池
 const pool = require("../config/pool");
-const mysql = require('mysql')
+const mysql = require('mysql');
 
 /**
  * 查询会员列表
