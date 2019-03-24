@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const formidable = require("formidable");
 const fs = require("fs");
 
+
 const app = express();
 app.use(express.static("public"));
 
@@ -38,11 +39,13 @@ const roles = require('./routes/roles');
 const admin = require('./routes/admin');
 const suite = require('./routes/suite');
 const category = require('./routes/category');
+const goods = require('./routes/goods');
 app.use('/users', users);
 app.use('/roles', roles);
 app.use('/admin', admin);
 app.use('/suite', suite);
 app.use('/category', category);
+app.use('/goods', goods);
 
 // 运行端口号
 app.listen(8888);

@@ -13,6 +13,7 @@
     "formidable": "latest",
     "cors": "latest",
     "express-session": "latest",
-    "moment": "latest"
+    "moment": "latest",
+    "md5": "latest"
   }
 }
