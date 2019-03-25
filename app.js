@@ -41,6 +41,7 @@ const suite = require('./routes/suite');
 const category = require('./routes/category');
 const goods = require('./routes/goods');
 const orderSetting = require('./routes/orderSetting');
+const order = require('./routes/order');
 app.use('/users', users);
 app.use('/roles', roles);
 app.use('/admin', admin);
@@ -48,6 +49,7 @@ app.use('/suite', suite);
 app.use('/category', category);
 app.use('/goods', goods);
 app.use('/order_setting', orderSetting);
+app.use('/order', order);
 
 // 运行端口号
 app.listen(8888);
